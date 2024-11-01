@@ -17,9 +17,8 @@ llm=ChatGroq(model="llama-3.1-70b-versatile")
 def vectorize_search(doc, model="sentence-transformers/all-mpnet-base-v2"): 
     embeddings = HuggingFaceEmbeddings(model_name=model)
     faiss_index = FAISS.load_local(
-        r"\assets\vectorstore",
-        embeddings,
         doc,
+        embeddings,
         allow_dangerous_deserialization=True
     )
     return faiss_index

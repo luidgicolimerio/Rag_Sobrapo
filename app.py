@@ -1,7 +1,7 @@
 import streamlit as st
 from rag_functions import rag, vectorize_search
 
-vectorstore = vectorize_search("all-MiniLM-L6-v2(chunk)", "sentence-transformers/all-MiniLM-L6-v2")
+vectorstore = vectorize_search(r"\assets\vectorstore\all-MiniLM-L6-v2(chunk).pkl", "sentence-transformers/all-MiniLM-L6-v2")
 retriever = vectorstore.as_retriever()
 
 st.title("💬 Chatbot Sobrapo")
