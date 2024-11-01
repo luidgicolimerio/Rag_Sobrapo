@@ -20,6 +20,7 @@ def vectorize_search(doc, model="sentence-transformers/all-mpnet-base-v2"):
         "./assets",
         embeddings,
         doc,
+        embeddings,
         allow_dangerous_deserialization=True
     )
     return faiss_index
