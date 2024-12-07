@@ -1,8 +1,32 @@
-import streamlit as st
-from rag_functions import rag, vectorize_search
+import os
+from langchain_qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+from langchain_huggingface import HuggingFaceEmbeddings
 
-vectorstore = vectorize_search("all-MiniLM-L6-v2(chunk)", "sentence-transformers/all-MiniLM-L6-v2")
-retriever = vectorstore.as_retriever()
+from dotenv import load_dotenv
+
+load_dotenv()
+
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
+qdrant_url = os.getenv("QDRANT_URL")
+
+client = QdrantClient(
+    url=qdrant_url,
+    api_key=qdrant_api_key,
+)
+
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+# Conecte ao Vector Store
+vector_store = QdrantVectorStore(
+    client=client,
+    collection_name="sobrapo_collection",  # Nome da coleção salva
+    embedding=embeddings,
+)
+
+retriever = vector_store.as_retriever(search_type="mmr", search_kwargs={"k": 1})
+
+from rag import answer_question
+import streamlit as st
 
 st.title("💬 Chatbot Sobrapo")
 
@@ -17,7 +41,7 @@ if prompt := st.chat_input():
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
     
-    results = rag(prompt, retriever, vectorstore)
+    results = answer_question(prompt, retriever)
     msg = results['answer']
     st.session_state.messages.append({"role": "assistant", "content": msg})
     st.chat_message("assistant").write(msg)
